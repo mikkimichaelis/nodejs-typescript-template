@@ -1,14 +1,13 @@
-const pageScraper = require('./pageScraper');
-async function scrapeAll(browserInstance: any){
+import { Browser } from "puppeteer";
+import { scraperObject } from './pageScraper';
+
+export async function scrapeAll(browserInstance: Browser){
 	let browser;
 	try{
 		browser = await browserInstance;
-		await pageScraper.scraper(browser);	
-		
+		return scraperObject.scraper(browser);	
 	}
 	catch(err){
 		console.log("Could not resolve the browser instance => ", err);
 	}
 }
-
-module.exports = (browserInstance: any) => scrapeAll(browserInstance)

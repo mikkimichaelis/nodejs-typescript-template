@@ -5,12 +5,16 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 
+import { startBrowser } from './browser';
+import { scrapeAll } from './pageController';
+import { exit } from 'process';
 
-const browserObject = require('./browser');
-const scraperController = require('./pageController');
+(async () => {
+    let browser = await startBrowser();
+    const meetings = await scrapeAll(browser)
 
-//Start the browser and create a browser instance
-let browserInstance = browserObject.startBrowser();
-
-// Pass the browser instance to the scraper controller
-scraperController(browserInstance)
+    var fs = require('fs');
+    fs.writeFile('meetings.json', JSON.stringify(meetings), 'utf8', () => {
+        exit();
+    });    
+})();
