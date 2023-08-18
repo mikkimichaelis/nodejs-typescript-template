@@ -49,7 +49,8 @@ export const scraperObject = {
                     language: '',
                     zid: '',
                     closed: false,
-                    description: ''
+                    description: '',
+                    delete: false
                 }
             });
         });
@@ -57,6 +58,9 @@ export const scraperObject = {
         // filter out all non zoom meetings
         meetings = meetings.filter(meeting => meeting.href?.includes('zoom'));
 
+        // filter out all Temp meetings
+        // meetings = meetings.filter(meeting => !meeting.name.split(' ').includes('Temp'));
+ 
         // extract passwords from additional
         meetings = meetings.map(meeting => {
             // find password or passcode or passwort (lol)
@@ -213,6 +217,25 @@ export const scraperObject = {
 
             return meeting;
         }).filter(meeting => meeting !== null);
+
+        // remove duplicate meetings
+        for (let meeting of meetings) {
+            if (meeting.delete) continue;
+            for (let _meeting of meetings) {
+                if (_meeting === meeting) {
+                    continue;
+                }
+                let duplicate = meeting.zid === _meeting.zid
+                    && meeting.day === _meeting.day
+                    && meeting.time24h === _meeting.time24h
+
+                if (duplicate) {
+                    _meeting.delete = true;
+                }
+            }
+        }
+
+        meetings = meetings.filter(meeting => !meeting.delete);
 
         const _meetings = meetings.map(_meeting => {
             const meeting = new Meeting({
