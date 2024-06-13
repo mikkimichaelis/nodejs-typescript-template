@@ -7,7 +7,8 @@ export async function startBrowser(): Promise<Browser>{
 	    return await launch({
 	        headless: 'new',
 	        args: ["--disable-setuid-sandbox"],
-	        'ignoreHTTPSErrors': true
+	        'ignoreHTTPSErrors': true,
+            protocolTimeout: 9999999
 	    });
 	} catch (err) {
 	    console.log("Could not create a browser instance => : ", err);

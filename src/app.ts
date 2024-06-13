@@ -3,18 +3,25 @@
  * so that env vars from the .env file are present in process.env
  */
 import * as dotenv from 'dotenv';
+import * as fs from 'fs';
 dotenv.config();
 
 import { startBrowser } from './browser';
 import { scrapeAll } from './pageController';
 import { exit } from 'process';
+import { Meeting } from './shared/models/meeting';
 
 (async () => {
     let browser = await startBrowser();
-    const meetings = await scrapeAll(browser)
-
-    var fs = require('fs');
-    fs.writeFile('meetings.json', JSON.stringify(meetings), 'utf8', () => {
-        exit();
-    });    
+    for await (const weekday of Meeting.weekdays.reverse()) {
+        console.log(weekday);
+        try {
+            const meetings = await scrapeAll(browser, weekday)
+            fs.writeFileSync(`${weekday.toLowerCase()}.json`, JSON.stringify(meetings?.map(m => m.toObject())), 'utf8');
+        } catch (e) {
+            console.error(e);
+            debugger;
+        }
+    }
+    exit();
 })();
